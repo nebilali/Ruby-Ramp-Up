@@ -16,17 +16,17 @@ def pi_nth (percision, limit=1000)
 
 	while num_digits <= precision
 		if 4 * q + r - t < n * t
+			# Add decimal only after first digit. 
+			if (num_digits == 1)
+				output << "." 
+			end
+
 			# Add digit to output. 
 			output << n.to_s
 
 			# Update state.
 			num_digits += 1
 			q,r,n = [10*q, 10*(r-n*t), (10*(3*q+r))/t-10*n]
-
-			# Add decimal only after first digit. 
-			if (num_digits == 1)
-				output << "." 
-			end
 		else
 			# Update state.
 			q,r,t,k,n,l = [q*k, (2*q+r)*l, t*l, k+1, 
@@ -34,9 +34,38 @@ def pi_nth (percision, limit=1000)
 		end
 	end
 	return output
+end
+
+# Implement using Enumerator
+def pi_nth_genrator (percision, limit=1000)
+	# initalize state.
+	q, r, t, k, n, l = 1, 0, 1, 1, 3, 3
+	precision = [percision, limit].min
+	num_digits = 0
+	Enumerator.new do |enum|
+		while num_digits <= precision
+			if 4 * q + r - t < n * t
+				# Add decimal only after first digit. 
+				if (num_digits == 1)
+					 enum.yield "." 
+				end
+
+				# Output digit. 
+				enum.yield n.to_s
+				# Update state.
+				num_digits += 1
+				q,r,n = [10*q, 10*(r-n*t), (10*(3*q+r))/t-10*n]
+			else
+				# Update state.
+				q,r,t,k,n,l = [q*k, (2*q+r)*l, t*l, k+1, 
+				    (q*(7*k+2)+r*l)/(t*l), l+2]
+			end
+		end
+	end
 end 
 
 if __FILE__ == $0
 	first_arg = ARGV[0]
-	puts pi_nth(first_arg.to_i)
+	pi_nth_genrator(first_arg.to_i).each { |x| print x }
+	print "\n"	
 end
