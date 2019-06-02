@@ -87,14 +87,13 @@ class UnitConverter
 			'F' => Fahrenheit.new(value)
 		}
 
-		unless validate(init_map[unit], init_map[converting_unit])
-			return "Unconvertable input units." 
-		end
+		return "Unconvertable input units." unless 
+		valid?(init_map[unit], init_map[converting_unit])
 
 		init_map[unit].convert(converting_unit).to_s
 	end
 
-	def validate (unit, converting_unit)
+	def valid? (unit, converting_unit)
 		unit.class.superclass.equal?(converting_unit.class.superclass)
 	end
 end
